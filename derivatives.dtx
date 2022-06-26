@@ -1,0 +1,303 @@
+% \iffalse meta-comment
+%
+% Copyright (C) 2022 by Shimushu
+%
+% This file may be distributed and/or modified under the conditions of the
+% LaTeX Project Public License, either version 1.3c of this license or
+% (at your option) any later version.  The latest version of this license
+% is in:
+%
+% http://www.latex-project.org/lppl.txt
+%
+% and version 1.3c or later is part of all distributions of LaTeX
+% version 2008/05/04 or later.
+%
+% \fi
+%
+% \iffalse
+%<package>\NeedsTeXFormat{LaTeX2e}[1999/12/01]
+%<package>\ProvidesPackage{derivatives}
+%<package>  [2022/06/23 v0.0.1 derivatives macros]
+%
+%<*driver>
+\documentclass{ltxdoc}
+\usepackage{derivatives}
+
+\usepackage{booktabs}
+\usepackage{caption}
+\usepackage{cprotect}
+\usepackage{geometry}
+\usepackage[backend=biber, style=gb7714-2015]{biblatex}
+\usepackage[colorlinks]{hyperref}
+
+\geometry{
+  top    = 2.54cm,
+  bottom = 2.54cm,
+  left   = 2.54cm,
+  right  = 2.54cm
+}
+
+\addbibresource[location=local]{ref.bib}
+
+\DeclareRobustCommand\email[1]{\href{mailto:#1}{\texttt{#1}}}
+
+\EnableCrossrefs
+\CodelineIndex
+\RecordChanges
+
+\begin{document}
+\DocInput{\jobname.dtx}
+\printbibliography
+\PrintIndex
+\PrintChanges
+\end{document}
+%</driver>
+% \fi
+%
+% \CheckSum{0}
+%
+% \CharacterTable
+%  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
+%   Lower-case    \a\b\c\d\e\f\g\h\i\j\k\l\m\n\o\p\q\r\s\t\u\v\w\x\y\z
+%   Digits        \0\1\2\3\4\5\6\7\8\9
+%   Exclamation   \!     Double quote  \"     Hash (number) \#
+%   Dollar        \$     Percent       \%     Ampersand     \&
+%   Acute accent  \'     Left paren    \(     Right paren   \)
+%   Asterisk      \*     Plus          \+     Comma         \,
+%   Minus         \-     Point         \.     Solidus       \/
+%   Colon         \:     Semicolon     \;     Less than     \<
+%   Equals        \=     Greater than  \>     Question mark \?
+%   Commercial at \@     Left bracket  \[     Backslash     \\
+%   Right bracket \]     Circumflex    \^     Underscore    \_
+%   Grave accent  \`     Left brace    \{     Vertical bar  \|
+%   Right brace   \}     Tilde         \~}
+% \changes{v0.0.1}{2022/06/23}{Initial version}
+% \GetFileInfo{derivatives.sty}
+% \DoNotIndex{\usepackage}
+% \title{Elegant derivatives: \textsf{derivatives}}
+% \author{Shimushu \\ \email{shimushushushu@outlook.com}}
+% \date{\fileversion, \filedate}
+% \maketitle
+%
+% \section{Introduction}
+%
+% This package simply wraps some commonly-used commands to typeset derivatives
+% like $\tderiv[2]{y}{x}$, $\pderiv[4]{v}{x}$, and $\mderiv{\rho}$.
+%
+% \section{Usage}
+%
+% If we want to typeset a total derivative, like $\tderiv{y}{x}$, we simply
+% type |\tderiv{y}{x}| in math mode, similar to |\pderiv{u}{t}| for
+% $\pderiv{u}{t}$ and |\mderiv{\rho}| for $\mderiv{\rho}$.
+% If we want a higher order derivative, just add a \oarg{order} in front of
+% the function, like |\pderiv[2]{u}{t}| to obtain $\pderiv[2]{u}{t}$.
+% If we want to typeset derivatives in a displayed equation, just do it as
+% we do in an inline equation, and the package will handle that.
+% For example, |c^2 \pderiv[2]{u}{x} = \pderiv[2]{u}{t}| gives
+% \begin{equation}
+% c^2 \pderiv[2]{u}{x} = \pderiv[2]{u}{t}
+% \end{equation}
+% instead of
+% \begin{equation}
+% \textstyle c^2 \pderiv[2]{u}{x} = \pderiv[2]{u}{t}.
+% \end{equation}
+% But what should be noticed is that |\tderiv{y}{x}| is slightly different
+% from |\tderiv[]{y}{x}|, shown in Table~\ref{tab:tderiv-usage}.
+% And the former is recommended.
+% \begin{table}[htbp]
+%   \centering
+%   \cprotect\caption{Difference between with and without empty |[]|.}
+%   \label{tab:tderiv-usage}
+%   \begin{tabular}{ll}
+%     \toprule
+%     Command & Result \\
+%     \midrule
+%     |$\tderiv{y}{x}$| & $\tderiv{y}{x}$ \\
+%     |$\tderiv[]{y}{x}$| & $\tderiv[]{y}{x}$ \\
+%     \bottomrule
+%   \end{tabular}
+% \end{table}
+%
+% \section{Remark}
+%
+% Since |xparse| is used in the package, although the user don't have to
+% explicitly import the package, it must be installed.
+% If \TeX{} Live is being used, |tlmgr install l3packages| can be used to
+% install the required package.
+%
+% \section{Implementation}
+%
+% As we mentioned earlier, |xparse| is used in the package.
+%    \begin{macrocode}
+%<*package>
+\usepackage{xparse}
+%    \end{macrocode}
+%
+% \begin{macro}{\tderiv@t}
+% \cs{tderiv@t} is the total derivative command in inline math mode, or
+% style~$T$ in Chapter~17, \textcite{Knuth_TeXbook_1984}.
+% |\mathop{} \!| is added to make axtra spaces between the derivative and
+% any other symbol in front of the derivative, and it vanishes if there's
+% no symbol before that\footnote{See
+% \url{https://liam.page/2017/05/01/the-correct-way-to-use-differential-operator/}.}.
+% Just refer to Table~\ref{tab:tderiv-impl} to see the difference.
+% \begin{table}[htbp]
+%   \centering
+%   \cprotect\caption{Difference between with and without |\mathop{} \!|.}
+%   \label{tab:tderiv-impl}
+%   \begin{tabular}{ll}
+%     \toprule
+%     Command & Result \\
+%     \midrule
+%     |$2 \tderiv{y}{x}$| & $2 \tderiv{y}{x}$ \\
+%     |$2 \, \mathrm{d} y / \mathrm{d} x$| &
+%     $2 \, \mathrm{d} y / \mathrm{d} x$ \\
+%     |$2 \mathrm{d} y / \mathrm{d} x$| &
+%     $2 \mathrm{d} y / \mathrm{d} x$ \\
+%     \bottomrule
+%   \end{tabular}
+% \end{table}
+%    \begin{macrocode}
+\DeclareRobustCommand\tderiv@t[3]{%
+  \IfNoValueTF{#1}{%
+    \mathop{} \! \mathrm{d} #2{} / \mathrm{d} {#3}%
+  } {%
+    \mathop{} \! \mathrm{d}^{#1} #2{} / \mathrm{d} {#3}^{#1}%
+  }%
+}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\tderiv@d}
+% \cs{tderiv@d} is the total derivative command in display math mode,
+% or style~$D$.
+%    \begin{macrocode}
+\DeclareRobustCommand\tderiv@d[3]{%
+  \IfNoValueTF{#1}{%
+    \frac{\mathrm{d} #2{}}{\mathrm{d} {#3}}%
+  } {%
+    \frac{\mathrm{d}^{#1} #2{}}{\mathrm{d} {#3}^{#1}}%
+  }%
+}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\tderiv}
+% \cs{tderiv} is the interface to typeset the total derivative.
+% \cs{mathchoice} is used here to choose a proper form of `fraction',
+% \textit{loc cit}.
+% If in style $S$ or~$\mathit{SS}$, nothing will be typeset.
+%    \begin{macrocode}
+\NewDocumentCommand\tderiv{omm}
+  {\mathchoice{\tderiv@d{#1}{#2}{#3}}{\tderiv@t{#1}{#2}{#3}}{}{}}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\pderiv@t}
+% \cs{pderiv@t} is the partial derivative command in inline math mode.
+%    \begin{macrocode}
+\DeclareRobustCommand\pderiv@t[3]{%
+  \IfNoValueTF{#1}{%
+    \mathop{} \! \partial #2{} / \partial {#3}%
+  } {%
+    \mathop{} \! \partial^{#1} #2{} / \partial {#3}^{#1}%
+  }%
+}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\pderiv@d}
+% \cs{pderiv@d} is the total derivative command in display math mode.
+%    \begin{macrocode}
+\DeclareRobustCommand\pderiv@d[3]{%
+  \IfNoValueTF{#1}{%
+    \frac{\partial #2{}}{\partial {#3}}%
+  } {%
+    \frac{\partial^{#1} #2{}}{\partial {#3}^{#1}}%
+  }%
+}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\pderiv}
+% \cs{pderiv} is the interface to typeset the partial derivative.
+%    \begin{macrocode}
+\NewDocumentCommand\pderiv{omm}
+  {\mathchoice{\pderiv@d{#1}{#2}{#3}}{\pderiv@t{#1}{#2}{#3}}{}{}}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\mderiv@t}
+% \cs{mderiv@t} is the material derivative command in inline math mode.
+%    \begin{macrocode}
+\DeclareRobustCommand\mderiv@t[2]{%
+  \IfNoValueTF{#1}{%
+    \mathop{} \! \mathrm{D} #2{} / \mathrm{D} t%
+  } {%
+    \mathop{} \! \mathrm{D}^{#1} #2{} / \mathrm{D} t^{#1}%
+  }%
+}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\mderiv@d}
+% \cs{mderiv@d} is the material derivative command in display math mode.
+%    \begin{macrocode}
+\DeclareRobustCommand\mderiv@d[2]{%
+  \IfNoValueTF{#1}{%
+    \frac{\mathrm{D} #2{}}{\mathrm{D} t}%
+  } {%
+    \frac{\mathrm{D}^{#1} #2{}}{\mathrm{D} t^{#1}}%
+  }%
+}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\mderiv}
+% \cs{mderiv} is the interface to typeset the material derivative.
+%    \begin{macrocode}
+\NewDocumentCommand\mderiv{om}
+  {\mathchoice{\mderiv@d{#1}{#2}}{\mderiv@t{#1}{#2}}{}{}}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\xderiv@t}
+% \cs{xderiv@t} is the derivative command in inline math mode.
+%    \begin{macrocode}
+\DeclareRobustCommand\xderiv@t[4]{%
+  \IfNoValueTF{#2}{%
+    #1{} #3{} / #1{} #4{}%
+  } {%
+    {#1}^{#2} #3{} / #1{} {#4}^{#2}%
+  }%
+}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\xderiv@d}
+% \cs{xderiv@d} is the derivative command in display math mode.
+%    \begin{macrocode}
+\DeclareRobustCommand\xderiv@d[4]{%
+  \IfNoValueTF{#2}{%
+    \frac{#1{} #3{}}{#1{} #4{}}%
+  } {%
+    \frac{{#1}^{#2} #3{}}{#1{} {#4}^{#2}}%
+  }%
+}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\xderiv}
+% \cs{xderiv} is the interface to typeset any kind of derivative.
+%    \begin{macrocode}
+\NewDocumentCommand\xderiv{momm}
+  {\mathchoice{\xderiv@d{#1}{#2}{#3}{#4}}{\xderiv@t{#1}{#2}{#3}{#4}}{}{}}
+%    \end{macrocode}
+% \end{macro}
+%
+%    \begin{macrocode}
+%</package>
+%    \end{macrocode}
+%
+% \Finale
+\endinput
