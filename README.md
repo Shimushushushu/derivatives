@@ -21,4 +21,4 @@ Then, put them (`.sty`, `.ins`, `.dtx`, and probably `.pdf`) in
 `<TeX-directory>/texmf-local/`, then run `texhash` to finish the installation.
 
 ## Disclaimer
-See LPPL-1.3c, and reach me by 
+See LPPL-1.3c, or reach me by https://github.com/Shimushushushu/derivatives/issues/.
